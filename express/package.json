@@ -3,14 +3,15 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-  "dev": "ts-node src/index.ts",
-  "prisma:seed": "ts-node prisma/seed.ts"
-},
+    "dev": "ts-node src/index.ts",
+    "prisma:seed": "ts-node prisma/seed.ts"
+  },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^6.16.3",
     "@prisma/client": "^6.18.0",
     "@prisma/extension-accelerate": "2.0.2",
     "date-fns": "^4.1.0",
+    "dotenv": "^17.2.3",
     "express": "5.1.0"
   },
   "devDependencies": {

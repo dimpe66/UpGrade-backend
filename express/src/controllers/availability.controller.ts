@@ -38,6 +38,6 @@ export const createAvailability = async (req: Request, res: Response) => {
     res.status(201).json({ availability, slots });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error creating availability" });
+    res.status(500).json({ error: "Error al crear disponibilidad" });
   }
 };

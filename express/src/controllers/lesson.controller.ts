@@ -15,7 +15,7 @@ export const getLessons = async (req: Request, res: Response) => {
     });
     res.json(lessons);
   } catch (error) {
-    res.status(500).json({ error: "Error fetching lessons" });
+    res.status(500).json({ error: "Error al buscar clases" });
   }
 };
 
@@ -24,12 +24,12 @@ export const createLesson = async (req: Request, res: Response) => {
     const { slotId, studentId, tutorId, subjectId, modality, timestamp } = req.body;
 
     if (!slotId || !studentId || !tutorId || !subjectId || !modality || !timestamp) {
-      return res.status(400).json({ error: "Missing required fields" });
+      return res.status(400).json({ error: "Faltan campos requeridos" });
     }
 
     const slot = await prisma.classSlot.findUnique({ where: { id: slotId } });
     if (!slot || slot.status !== SlotStatus.AVAILABLE) {
-      return res.status(400).json({ error: "Slot not available" });
+      return res.status(400).json({ error: "Módulo de clase no disponible" });
     }
 
     const lesson = await prisma.lesson.create({
@@ -55,6 +55,6 @@ export const createLesson = async (req: Request, res: Response) => {
 
     res.status(201).json(lesson);
   } catch (error) {
-    res.status(500).json({ error: "Error creating lesson" });
+    res.status(500).json({ error: "Error al crear la clase" });
   }
 };

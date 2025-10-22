@@ -1,3 +1,14 @@
+# ENV configuración
+
+🚨IMPORTANTE🚨
+A nivel raíz del directorio "express", debe crear un archivo ".env" con las configuraciónes:
+
+PORT=_3000_
+
+DATABASE_URL=_"file:./dev.db"_
+
+*En un futuro también se utilizará para guardar el hash para claves
+
 # REST API Example with Express & Prisma Postgres
 
 This example shows how to implement a **REST API with TypeScript** using [Express](https://expressjs.com/), Prisma ORM and a [Prisma Postgres](https://www.prisma.io/postgres) database.

@@ -7,21 +7,100 @@ datasource db {
   url      = "file:./dev.db"
 }
 
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  posts Post[]
+enum SlotStatus {
+  AVAILABLE
+  RESERVED
+  CANCELLED
 }
 
-model Post {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  viewCount Int      @default(0)
-  author    User?    @relation(fields: [authorId], references: [id])
-  authorId  Int?
+enum LessonStatus {
+  PENDING
+  DONE
+  CANCELLED
+}
+
+enum Modality {
+  ONLINE
+  ONSITE
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  firstName    String
+  lastName     String
+  email        String    @unique
+  xpLevel      Int       @default(0)
+  rating       Float?
+  profilePhoto String?
+
+  tutorAvailabilities TutorAvailability[]
+  classSlots          ClassSlot[]       @relation("TutorClassSlots")
+  reservedSlots       ClassSlot[]       @relation("ReservedSlots")
+  lessonsAsStudent    Lesson[]          @relation("StudentLessons")
+  lessonsAsTutor      Lesson[]          @relation("TutorLessons")
+  tutorSubjects       TutorSubject[]    @relation("UserToSubject")
+}
+
+model Subject {
+  id       Int     @id @default(autoincrement())
+  name     String
+  iconUrl  String?
+  classSlots ClassSlot[]
+  lessons    Lesson[]
+  tutorSubjects TutorSubject[] @relation("UserToSubject")
+}
+
+model TutorAvailability {
+  id         Int      @id @default(autoincrement())
+  tutorId    Int
+  weekday    Int
+  startTime  String
+  endTime    String
+  startDate  DateTime
+  endDate    DateTime
+  active     Boolean  @default(true)
+  tutor      User     @relation(fields: [tutorId], references: [id])
+}
+
+model ClassSlot {
+  id           Int         @id @default(autoincrement())
+  tutorId      Int
+  subjectId    Int?         // Es opcional porque aún no le vemos una feature que realmente requiera especificar hora de avialability por materia
+  date         DateTime
+  startTime    String
+  endTime      String
+  reservedById Int?
+  status       SlotStatus  @default(AVAILABLE)
+  deleted      Boolean     @default(false)
+  tutor        User        @relation("TutorClassSlots", fields: [tutorId], references: [id])
+  subject      Subject?    @relation(fields: [subjectId], references: [id]) // opcional también
+  reservedBy   User?       @relation("ReservedSlots", fields: [reservedById], references: [id])
+  lesson       Lesson?
+}
+
+
+model Lesson {
+  id          Int          @id @default(autoincrement())
+  slotId      Int          @unique
+  studentId   Int
+  tutorId     Int
+  subjectId   Int
+  modality    Modality
+  timestamp   DateTime
+  status      LessonStatus @default(PENDING)
+
+  slot        ClassSlot    @relation(fields: [slotId], references: [id])
+  student     User         @relation("StudentLessons", fields: [studentId], references: [id])
+  tutor       User         @relation("TutorLessons", fields: [tutorId], references: [id])
+  subject     Subject      @relation(fields: [subjectId], references: [id])
+}
+
+model TutorSubject {
+  tutorId   Int
+  subjectId Int
+
+  tutor     User    @relation("UserToSubject", fields: [tutorId], references: [id])
+  subject   Subject @relation("UserToSubject", fields: [subjectId], references: [id])
+
+  @@id([tutorId, subjectId])
 }

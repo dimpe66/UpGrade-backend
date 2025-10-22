@@ -2,6 +2,7 @@
 
 🚨IMPORTANTE🚨
 A nivel raíz del directorio "express", debe crear un archivo ".env" con las configuraciónes:
+
 PORT=_3000_
 DATABASE_URL=_"file:./dev.db"_
 

@@ -4,6 +4,7 @@
 A nivel raíz del directorio "express", debe crear un archivo ".env" con las configuraciónes:
 
 PORT=_3000_
+
 DATABASE_URL=_"file:./dev.db"_
 
 *En un futuro también se utilizará para guardar el hash para claves

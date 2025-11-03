@@ -1,30 +1,20 @@
 import express from "express";
-import dotenv from "dotenv";
+import cors from "cors";
 import userRoutes from "./routes/user.routes";
 import subjectRoutes from "./routes/subject.routes";
 import availabilityRoutes from "./routes/availability.routes";
+import slotRoutes from "./routes/slots.routes";
 import lessonRoutes from "./routes/lesson.routes";
-import cors from "cors";
-
-dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT;
-
-app.use(
-  cors({
-    origin: "*", 
-    methods: ["GET", "POST"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+app.use(cors());
 app.use(express.json());
 
 app.use("/users", userRoutes);
 app.use("/subjects", subjectRoutes);
 app.use("/availability", availabilityRoutes);
+app.use("/slots", slotRoutes);
 app.use("/lessons", lessonRoutes);
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => console.log(`🚀 API running on port ${PORT}`));

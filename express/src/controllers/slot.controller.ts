@@ -1,6 +1,5 @@
-import { PrismaClient, SlotStatus } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
-
 const prisma = new PrismaClient();
 
 export const getSlots = async (req: Request, res: Response) => {
@@ -9,77 +8,39 @@ export const getSlots = async (req: Request, res: Response) => {
     const where: any = { deleted: false };
     if (tutorId) where.tutorId = Number(tutorId);
     if (status) where.status = status;
-
-    const slots = await prisma.classSlot.findMany({
-      where,
-      include: {
-        tutor: true,
-        reservedBy: true,
-        lesson: true,
-      },
-      orderBy: { date: "asc" },
-    });
-
+    const slots = await prisma.classSlot.findMany({ where, include: { tutor: true }, orderBy: { date: "asc" } });
     res.json(slots);
   } catch {
-    res.status(500).json({ error: "Error al obtener los módulos de clase" });
+    res.status(500).json({ error: "Error fetching slots" });
   }
 };
 
 export const createSlot = async (req: Request, res: Response) => {
   try {
     const { tutorId, date, startTime, endTime } = req.body;
-    if (!tutorId || !date || !startTime || !endTime) {
-      return res.status(400).json({ error: "Faltan campos requeridos" });
-    }
-
-    const slot = await prisma.classSlot.create({
-      data: {
-        tutorId,
-        date: new Date(date),
-        startTime,
-        endTime,
-        status: SlotStatus.AVAILABLE,
-        deleted: false,
-      },
-    });
-
+    const slot = await prisma.classSlot.create({ data: { tutorId, date, startTime, endTime } });
     res.status(201).json(slot);
   } catch {
-    res.status(500).json({ error: "Error al crear el módulo de clase" });
+    res.status(500).json({ error: "Error creating slot" });
   }
 };
 
 export const updateSlot = async (req: Request, res: Response) => {
   try {
-    const { id, date, startTime, endTime, status, deleted } = req.body;
-    if (!id) return res.status(400).json({ error: "Falta id" });
-
-    const slot = await prisma.classSlot.update({
-      where: { id: Number(id) },
-      data: {
-        date: date ? new Date(date) : undefined,
-        startTime,
-        endTime,
-        status,
-        deleted,
-      },
-    });
-
+    const { id, ...data } = req.body;
+    const slot = await prisma.classSlot.update({ where: { id: Number(id) }, data });
     res.json(slot);
   } catch {
-    res.status(500).json({ error: "Error al actualizar el módulo de clase" });
+    res.status(500).json({ error: "Error updating slot" });
   }
 };
 
 export const deleteSlot = async (req: Request, res: Response) => {
   try {
     const { id } = req.body;
-    if (!id) return res.status(400).json({ error: "Falta id" });
-
-    await prisma.classSlot.delete({ where: { id: Number(id) } });
-    res.json({ message: "Módulo eliminado" });
+    await prisma.classSlot.update({ where: { id: Number(id) }, data: { deleted: true } });
+    res.json({ message: "Slot deleted" });
   } catch {
-    res.status(500).json({ error: "Error al eliminar el módulo de clase" });
+    res.status(500).json({ error: "Error deleting slot" });
   }
 };

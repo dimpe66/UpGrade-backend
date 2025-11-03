@@ -1,9 +1,11 @@
-import express from "express";
-import { createAvailability, getTutorAvailability } from "../controllers/availability.controller";
+import { Router } from "express";
+import { getAvailabilities, createAvailability, updateAvailability, deleteAvailability } from "../controllers/availability.controller";
 
-const router = express.Router();
+const router = Router();
 
-router.get("/", getTutorAvailability);
-router.post("/", createAvailability);
+router.get("/", getAvailabilities);
+router.post("/create", createAvailability);
+router.post("/update", updateAvailability);
+router.post("/delete", deleteAvailability);
 
 export default router;

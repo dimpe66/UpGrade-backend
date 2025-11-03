@@ -42,12 +42,11 @@ model User {
 }
 
 model Subject {
-  id       Int     @id @default(autoincrement())
-  name     String
-  iconUrl  String?
-  classSlots ClassSlot[]
-  lessons    Lesson[]
-  tutorSubjects TutorSubject[] @relation("UserToSubject")
+  id            Int             @id @default(autoincrement())
+  name          String
+  iconUrl       String?
+  lessons       Lesson[]
+  tutorSubjects TutorSubject[]  @relation("UserToSubject")
 }
 
 model TutorAvailability {
@@ -65,19 +64,17 @@ model TutorAvailability {
 model ClassSlot {
   id           Int         @id @default(autoincrement())
   tutorId      Int
-  subjectId    Int?         // Es opcional porque aún no le vemos una feature que realmente requiera especificar hora de avialability por materia
   date         DateTime
   startTime    String
   endTime      String
   reservedById Int?
   status       SlotStatus  @default(AVAILABLE)
   deleted      Boolean     @default(false)
+
   tutor        User        @relation("TutorClassSlots", fields: [tutorId], references: [id])
-  subject      Subject?    @relation(fields: [subjectId], references: [id]) // opcional también
   reservedBy   User?       @relation("ReservedSlots", fields: [reservedById], references: [id])
   lesson       Lesson?
 }
-
 
 model Lesson {
   id          Int          @id @default(autoincrement())

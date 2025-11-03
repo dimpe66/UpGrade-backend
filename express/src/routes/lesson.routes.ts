@@ -1,9 +1,11 @@
-import express from "express";
-import { getLessons, createLesson } from "../controllers/lesson.controller";
+import { Router } from "express";
+import { getLessons, createLesson, updateLessonStatus, deleteLesson } from "../controllers/lesson.controller";
 
-const router = express.Router();
+const router = Router();
 
 router.get("/", getLessons);
-router.post("/", createLesson);
+router.post("/create", createLesson);
+router.post("/update-status", updateLessonStatus);
+router.post("/delete", deleteLesson);
 
 export default router;

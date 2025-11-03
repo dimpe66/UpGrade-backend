@@ -4,7 +4,12 @@
   "license": "MIT",
   "scripts": {
     "dev": "ts-node src/index.ts",
-    "prisma:seed": "ts-node prisma/seed.ts"
+    "prisma:seed": "ts-node prisma/seed.ts",
+    "seed": "npx prisma db seed",
+    "reset:db": "del prisma\\dev.db && npx prisma generate && npx prisma migrate dev --name init --skip-generate && npx prisma db seed --force && npx prisma studio"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^6.16.3",

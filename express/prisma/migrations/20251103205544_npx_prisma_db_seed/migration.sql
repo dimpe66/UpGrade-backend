@@ -1,16 +1,13 @@
-/*
-  Warnings:
-
-  - You are about to drop the `Post` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the column `name` on the `User` table. All the data in the column will be lost.
-  - Added the required column `firstName` to the `User` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `lastName` to the `User` table without a default value. This is not possible if the table is not empty.
-
-*/
--- DropTable
-PRAGMA foreign_keys=off;
-DROP TABLE "Post";
-PRAGMA foreign_keys=on;
+-- CreateTable
+CREATE TABLE "User" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "firstName" TEXT NOT NULL,
+    "lastName" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "xpLevel" INTEGER NOT NULL DEFAULT 0,
+    "rating" REAL,
+    "profilePhoto" TEXT
+);
 
 -- CreateTable
 CREATE TABLE "Subject" (
@@ -36,7 +33,6 @@ CREATE TABLE "TutorAvailability" (
 CREATE TABLE "ClassSlot" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "tutorId" INTEGER NOT NULL,
-    "subjectId" INTEGER,
     "date" DATETIME NOT NULL,
     "startTime" TEXT NOT NULL,
     "endTime" TEXT NOT NULL,
@@ -44,7 +40,6 @@ CREATE TABLE "ClassSlot" (
     "status" TEXT NOT NULL DEFAULT 'AVAILABLE',
     "deleted" BOOLEAN NOT NULL DEFAULT false,
     CONSTRAINT "ClassSlot_tutorId_fkey" FOREIGN KEY ("tutorId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT "ClassSlot_subjectId_fkey" FOREIGN KEY ("subjectId") REFERENCES "Subject" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT "ClassSlot_reservedById_fkey" FOREIGN KEY ("reservedById") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
 
@@ -74,24 +69,8 @@ CREATE TABLE "TutorSubject" (
     CONSTRAINT "TutorSubject_subjectId_fkey" FOREIGN KEY ("subjectId") REFERENCES "Subject" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
--- RedefineTables
-PRAGMA defer_foreign_keys=ON;
-PRAGMA foreign_keys=OFF;
-CREATE TABLE "new_User" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "firstName" TEXT NOT NULL,
-    "lastName" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
-    "xpLevel" INTEGER NOT NULL DEFAULT 0,
-    "rating" REAL,
-    "profilePhoto" TEXT
-);
-INSERT INTO "new_User" ("email", "id") SELECT "email", "id" FROM "User";
-DROP TABLE "User";
-ALTER TABLE "new_User" RENAME TO "User";
+-- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
-PRAGMA foreign_keys=ON;
-PRAGMA defer_foreign_keys=OFF;
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Lesson_slotId_key" ON "Lesson"("slotId");

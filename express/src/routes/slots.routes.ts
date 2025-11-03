@@ -1,6 +1,11 @@
-import express from "express";
-import { getAvailableSlots } from "../controllers/slot.controller"
+import { Router } from "express";
+import { getSlots, createSlot, updateSlot, deleteSlot } from "../controllers/slot.controller";
 
-const router = express.Router();
-router.get("/", getAvailableSlots);
-export default router
+const router = Router();
+
+router.get("/", getSlots);
+router.post("/create", createSlot);
+router.post("/update", updateSlot);
+router.post("/delete", deleteSlot);
+
+export default router;

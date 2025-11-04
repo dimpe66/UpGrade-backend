@@ -1,5 +1,4 @@
 import express from "express";
-import cors from "cors";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -16,26 +15,6 @@ import { requireAuth } from "./auth/requireAuth";
 const app = express();
 
 app.use(express.json());
-
-const origins = (process.env.FRONTEND_ORIGIN ?? "")
-  .split(",")
-  .map(s => s.trim())
-  .filter(Boolean);
-
-app.use(
-  cors({
-    origin(origin, cb) {
-      if (!origin) return cb(null, true);
-      if (origins.length === 0 || origins.includes(origin)) return cb(null, true);
-      return cb(new Error("Not allowed by CORS"));
-    },
-    credentials: true, 
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
-
-app.options("*", cors());
 
 app.get("/health", (_req, res) => res.json({ ok: true }));
 app.use("/auth", authRoutes);

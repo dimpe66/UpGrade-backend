@@ -3,29 +3,38 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "dev": "ts-node src/index.ts",
-    "prisma:seed": "ts-node prisma/seed.ts",
-    "seed": "npx prisma db seed",
-    "reset:db": "del prisma\\dev.db && npx prisma generate && npx prisma migrate dev --name init --skip-generate && npx prisma db seed --force && npx prisma studio"
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "prisma:gen": "prisma generate",
+    "prisma:seed": "tsx prisma/seed.ts",
+    "seed": "prisma db seed",
+    "reset:db": "node scripts/reset-db.cjs"
   },
   "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^6.16.3",
     "@prisma/client": "^6.18.0",
     "@prisma/extension-accelerate": "2.0.2",
+    "argon2": "^0.44.0",
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "date-fns": "^4.1.0",
     "dotenv": "^17.2.3",
-    "express": "5.1.0"
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
-    "@types/express": "5.0.3",
-    "@types/node": "22.15.32",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^22.19.0",
     "prisma": "^6.18.0",
     "ts-node": "10.9.2",
-    "typescript": "5.8.2"
+    "tsx": "^4.20.6",
+    "typescript": "^5.8.2"
   }
 }

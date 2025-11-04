@@ -1,14 +1,44 @@
 import express from "express";
 import cors from "cors";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+import authRoutes from "./auth/auth.routes";
 import userRoutes from "./routes/user.routes";
 import subjectRoutes from "./routes/subject.routes";
 import availabilityRoutes from "./routes/availability.routes";
 import slotRoutes from "./routes/slots.routes";
 import lessonRoutes from "./routes/lesson.routes";
 
+import { requireAuth } from "./auth/requireAuth";
+
 const app = express();
-app.use(cors());
+
 app.use(express.json());
+
+const origins = (process.env.FRONTEND_ORIGIN ?? "")
+  .split(",")
+  .map(s => s.trim())
+  .filter(Boolean);
+
+app.use(
+  cors({
+    origin(origin, cb) {
+      if (!origin) return cb(null, true);
+      if (origins.length === 0 || origins.includes(origin)) return cb(null, true);
+      return cb(new Error("Not allowed by CORS"));
+    },
+    credentials: true, 
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
+app.options("*", cors());
+
+app.get("/health", (_req, res) => res.json({ ok: true }));
+app.use("/auth", authRoutes);
 
 app.use("/users", userRoutes);
 app.use("/subjects", subjectRoutes);
@@ -16,5 +46,7 @@ app.use("/availability", availabilityRoutes);
 app.use("/slots", slotRoutes);
 app.use("/lessons", lessonRoutes);
 
-const PORT = process.env.PORT || 4000;
+
+
+const PORT = Number(process.env.PORT ?? 3001);
 app.listen(PORT, () => console.log(`🚀 API running on port ${PORT}`));

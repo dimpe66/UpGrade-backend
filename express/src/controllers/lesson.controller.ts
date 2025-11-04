@@ -1,5 +1,7 @@
 import { PrismaClient, LessonStatus, SlotStatus } from "@prisma/client";
 import { Request, Response } from "express";
+import { AuthedRequest } from "../auth/requireAuth";
+
 const prisma = new PrismaClient();
 
 export const getLessons = async (req: Request, res: Response) => {
@@ -14,19 +16,23 @@ export const getLessons = async (req: Request, res: Response) => {
   }
 };
 
-export const createLesson = async (req: Request, res: Response) => {
+export const createLesson = async (req: AuthedRequest, res: Response) => {
   try {
-    const { slotId, studentId, tutorId, subjectId, modality, timestamp } = req.body;
+    const { slotId, tutorId, subjectId, modality, timestamp } = req.body;
+
+    const studentIdFromToken = req.user ? Number(req.user.sub) : undefined;
+    const studentId = studentIdFromToken ?? Number(req.body.studentId); 
+
     const slot = await prisma.classSlot.findUnique({ where: { id: Number(slotId) } });
     if (!slot || slot.status !== SlotStatus.AVAILABLE)
       return res.status(400).json({ error: "Slot not available" });
 
     const lesson = await prisma.lesson.create({
       data: {
-        slotId,
-        studentId,
-        tutorId,
-        subjectId,
+        slotId: Number(slotId),
+        studentId: Number(studentId),
+        tutorId: Number(tutorId),
+        subjectId: Number(subjectId),
         modality,
         timestamp,
         status: LessonStatus.PENDING,
@@ -34,8 +40,8 @@ export const createLesson = async (req: Request, res: Response) => {
     });
 
     await prisma.classSlot.update({
-      where: { id: slotId },
-      data: { status: SlotStatus.RESERVED, reservedById: studentId },
+      where: { id: Number(slotId) },
+      data: { status: SlotStatus.RESERVED, reservedById: Number(studentId) },
     });
 
     res.status(201).json(lesson);

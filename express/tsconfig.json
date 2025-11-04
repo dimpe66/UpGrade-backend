@@ -1,9 +1,13 @@
 {
   "compilerOptions": {
-    "sourceMap": true,
-    "outDir": "dist",
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
     "strict": true,
-    "lib": ["esnext"],
-    "esModuleInterop": true
-  }
+    "skipLibCheck": true,
+    "outDir": "dist",
+    "types": ["node"]          // <- esto hace que 'process' tenga tipos
+  },
+  "include": ["src", "prisma"]
 }

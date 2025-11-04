@@ -1,10 +1,20 @@
 import { Router } from "express";
-import { getAvailabilities, createAvailability, updateAvailability, deleteAvailability } from "../controllers/availability.controller";
+import {
+  getAvailabilities,
+  createAvailability,
+  updateAvailability,
+  deleteAvailability,
+} from "../controllers/availability.controller";
+import { requireAuth } from "../auth/requireAuth";
+
 const router = Router();
 
+// publica cualquiera pueda ver horarios
 router.get("/", getAvailabilities);
-router.post("/", createAvailability);
-router.post("/update", updateAvailability);
-router.post("/delete", deleteAvailability);
+
+// Privadas (crear/editar/borrar requieren token)
+router.post("/", requireAuth, createAvailability);
+router.post("/update", requireAuth, updateAvailability);
+router.post("/delete", requireAuth, deleteAvailability);
 
 export default router;

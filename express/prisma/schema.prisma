@@ -29,6 +29,10 @@ model User {
   firstName    String
   lastName     String
   email        String    @unique
+  passwordHash      String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  passwordUpdatedAt DateTime @default(now())
   xpLevel      Int       @default(0)
   rating       Float?
   profilePhoto String?

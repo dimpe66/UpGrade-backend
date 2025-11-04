@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { getAvailabilities, createAvailability, updateAvailability, deleteAvailability } from "../controllers/availability.controller";
+import { getAvailability, createAvailability } from "../controllers/availability.controller";
+import { requireAuth } from "../auth/requireAuth";
+
 const router = Router();
 
-router.get("/", getAvailabilities);
-router.post("/", createAvailability);
-router.post("/update", updateAvailability);
-router.post("/delete", deleteAvailability);
+router.get("/", requireAuth, getAvailability);
+router.post("/", requireAuth, createAvailability);
 
 export default router;

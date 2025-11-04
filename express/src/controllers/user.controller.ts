@@ -1,45 +1,39 @@
 import { PrismaClient } from "@prisma/client";
-import { Request, Response } from "express";
+import { Response } from "express";
+import { AuthRequest } from "../auth/requireAuth";
+
 const prisma = new PrismaClient();
 
-export const getUsers = async (req: Request, res: Response) => {
+export const getUsers = async (_req: AuthRequest, res: Response) => {
   try {
-    const users = await prisma.user.findMany();
+    const users = await prisma.user.findMany({
+      select: { id: true, firstName: true, lastName: true, email: true, rating: true },
+      orderBy: { firstName: "asc" },
+    });
     res.json(users);
   } catch {
-    res.status(500).json({ error: "Error fetching users" });
+    res.status(500).json({ error: "Error al obtener usuarios" });
   }
 };
 
-export const createUser = async (req: Request, res: Response) => {
+export const getProfile = async (req: AuthRequest, res: Response) => {
   try {
-    const { firstName, lastName, email } = req.body;
-    if (!firstName || !lastName || !email) return res.status(400).json({ error: "Missing fields" });
-    const existing = await prisma.user.findUnique({ where: { email } });
-    if (existing) return res.status(409).json({ error: "Email already exists" });
-    const user = await prisma.user.create({ data: { firstName, lastName, email } });
-    res.status(201).json(user);
-  } catch {
-    res.status(500).json({ error: "Error creating user" });
-  }
-};
-
-export const updateUser = async (req: Request, res: Response) => {
-  try {
-    const { id, ...data } = req.body;
-    const user = await prisma.user.update({ where: { id: Number(id) }, data });
+    const user = await prisma.user.findUnique({
+      where: { id: req.user!.id },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        rating: true,
+        contactData: true,
+        classroomAddress: true,
+        onlineClassroomLink: true,
+      },
+    });
+    if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
     res.json(user);
   } catch {
-    res.status(500).json({ error: "Error updating user" });
-  }
-};
-
-export const deleteUser = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.body;
-    await prisma.user.delete({ where: { id: Number(id) } });
-    res.json({ message: "User deleted" });
-  } catch {
-    res.status(500).json({ error: "Error deleting user" });
+    res.status(500).json({ error: "Error al obtener perfil" });
   }
 };

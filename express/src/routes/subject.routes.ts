@@ -1,10 +1,9 @@
 import { Router } from "express";
-import { getSubjects, createSubject, updateSubject, deleteSubject } from "../controllers/subject.controller";
+import { getSubjects } from "../controllers/subject.controller";
+import { requireAuth } from "../auth/requireAuth";
+
 const router = Router();
 
-router.get("/", getSubjects);
-router.post("/", createSubject);
-router.post("/update", updateSubject);
-router.post("/delete", deleteSubject);
+router.get("/", requireAuth, getSubjects);
 
 export default router;

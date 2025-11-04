@@ -25,28 +25,33 @@ enum Modality {
 }
 
 model User {
-  id           Int       @id @default(autoincrement())
-  firstName    String
-  lastName     String
-  email        String    @unique
-  xpLevel      Int       @default(0)
-  rating       Float?
-  profilePhoto String?
+  id                 Int                 @id @default(autoincrement())
+  firstName          String
+  lastName           String
+  email              String              @unique
+  password           String
+  token              String?
+  xpLevel            Int                 @default(0)
+  rating             Float?
+  profilePhoto       String?
+  classroomAddress   String?
+  onlineClassroomLink String?
+  contactData        String?
 
   tutorAvailabilities TutorAvailability[]
-  classSlots          ClassSlot[]       @relation("TutorClassSlots")
-  reservedSlots       ClassSlot[]       @relation("ReservedSlots")
-  lessonsAsStudent    Lesson[]          @relation("StudentLessons")
-  lessonsAsTutor      Lesson[]          @relation("TutorLessons")
-  tutorSubjects       TutorSubject[]    @relation("UserToSubject")
+  classSlots          ClassSlot[]        @relation("TutorClassSlots")
+  reservedSlots       ClassSlot[]        @relation("ReservedSlots")
+  lessonsAsStudent    Lesson[]           @relation("StudentLessons")
+  lessonsAsTutor      Lesson[]           @relation("TutorLessons")
+  tutorSubjects       TutorSubject[]     @relation("UserToSubject")
 }
 
 model Subject {
-  id            Int             @id @default(autoincrement())
+  id            Int            @id @default(autoincrement())
   name          String
   iconUrl       String?
   lessons       Lesson[]
-  tutorSubjects TutorSubject[]  @relation("UserToSubject")
+  tutorSubjects TutorSubject[] @relation("UserToSubject")
 }
 
 model TutorAvailability {

@@ -152,3 +152,39 @@ export const updateMe = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ error: "Error al actualizar el perfil" });
   }
 };
+
+export const updateTutorSubjects = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user!.id;
+    const { subjectIds } = req.body as { subjectIds: number[] };
+
+    if (!Array.isArray(subjectIds)) {
+      return res.status(400).json({ error: "subjectIds debe ser un array de números" });
+    }
+    await prisma.tutorSubject.deleteMany({
+      where: { tutorId: userId },
+    });
+
+    const createData = subjectIds.map((id) => ({
+      tutorId: userId,
+      subjectId: id,
+    }));
+
+    if (createData.length > 0) {
+      await prisma.tutorSubject.createMany({ data: createData });
+    }
+
+    const updatedTutorSubjects = await prisma.tutorSubject.findMany({
+      where: { tutorId: userId },
+      include: { subject: true },
+    });
+
+    res.json({
+      message: "Materias actualizadas correctamente",
+      tutorSubjects: updatedTutorSubjects,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error al actualizar las materias del tutor" });
+  }
+};

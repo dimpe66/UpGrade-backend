@@ -41,10 +41,15 @@ export const createLesson = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: "El cupo no está disponible" });
 
     const existingLesson = await prisma.lesson.findFirst({
-      where: { slotId: slot.id },
+      where: {
+        slotId: slot.id,
+        status: {
+          in: [LessonStatus.PENDING],
+        },
+      },
     });
     if (existingLesson)
-      return res.status(400).json({ error: "Ya existe una clase para este cupo" });
+      return res.status(400).json({ error: "Ya existe una clase activa para este cupo" });
 
     const lesson = await prisma.lesson.create({
       data: {

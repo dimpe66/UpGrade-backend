@@ -75,12 +75,12 @@ model ClassSlot {
 
   tutor        User       @relation("TutorClassSlots", fields: [tutorId], references: [id])
   reservedBy   User?      @relation("ReservedSlots", fields: [reservedById], references: [id])
-  lesson       Lesson?
+  lesson       Lesson[]
 }
 
 model Lesson {
   id          Int          @id @default(autoincrement())
-  slotId      Int          @unique
+  slotId      Int          
   studentId   Int
   tutorId     Int
   subjectId   Int

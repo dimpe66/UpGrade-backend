@@ -74,7 +74,7 @@ export const getTutorsWithAvailableSlots = async (_req: AuthRequest, res: Respon
         classroomAddress: true,
         onlineClassroomLink: true,
         tutorSubjects: {
-          include: { subject: { select: { name: true, iconUrl: true } } },
+          include: { subject: { select: { id: true, name: true, iconUrl: true } } },
         },
         classSlots: {
           where: {

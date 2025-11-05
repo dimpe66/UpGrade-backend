@@ -4,6 +4,7 @@ import { AuthRequest } from "../auth/requireAuth";
 import { startOfDay } from "date-fns";
 
 const prisma = new PrismaClient();
+const XP_REWARD = 50; 
 
 export const getLessons = async (req: AuthRequest, res: Response) => {
   try {
@@ -14,7 +15,7 @@ export const getLessons = async (req: AuthRequest, res: Response) => {
     const lessons = await prisma.lesson.findMany({
       where: {
         OR: [{ tutorId: userId }, { studentId: userId }],
-        status: LessonStatus.PENDING, 
+        status: LessonStatus.PENDING,
         ...(includePast ? {} : { timestamp: { gte: now } }),
       },
       include: { tutor: true, student: true, subject: true, slot: true },
@@ -40,12 +41,13 @@ export const createLesson = async (req: AuthRequest, res: Response) => {
     if (!slot || slot.status !== SlotStatus.AVAILABLE)
       return res.status(400).json({ error: "El cupo no está disponible" });
 
+    if (slot.tutorId === studentId)
+      return res.status(400).json({ error: "No podés reservar una clase con vos mismo." });
+
     const existingLesson = await prisma.lesson.findFirst({
       where: {
         slotId: slot.id,
-        status: {
-          in: [LessonStatus.PENDING],
-        },
+        status: { in: [LessonStatus.PENDING] },
       },
     });
     if (existingLesson)
@@ -69,7 +71,15 @@ export const createLesson = async (req: AuthRequest, res: Response) => {
       data: { status: SlotStatus.RESERVED, reservedById: studentId },
     });
 
-    res.status(201).json({ message: "Clase reservada con éxito", lesson });
+    await prisma.user.updateMany({
+      where: { id: { in: [studentId, slot.tutorId] } },
+      data: { xpLevel: { increment: XP_REWARD } },
+    });
+
+    res.status(201).json({
+      message: `Clase reservada con éxito (+${XP_REWARD} XP para ambos)`,
+      lesson,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error al crear la clase" });
@@ -93,6 +103,7 @@ export const cancelLesson = async (req: AuthRequest, res: Response) => {
     if (lesson.status === LessonStatus.CANCELLED)
       return res.status(400).json({ error: "La clase ya estaba cancelada" });
 
+
     await prisma.lesson.update({
       where: { id: lessonId },
       data: { status: LessonStatus.CANCELLED },
@@ -103,7 +114,16 @@ export const cancelLesson = async (req: AuthRequest, res: Response) => {
       data: { status: SlotStatus.AVAILABLE, reservedById: null },
     });
 
-    res.json({ message: "Clase cancelada correctamente" });
+    if (lesson.status === LessonStatus.PENDING) {
+      await prisma.user.updateMany({
+        where: { id: { in: [lesson.studentId, lesson.tutorId] } },
+        data: { xpLevel: { decrement: XP_REWARD } },
+      });
+    }
+
+    res.json({
+      message: `Clase cancelada correctamente (-${XP_REWARD} XP para ambos)`,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error al cancelar la clase" });

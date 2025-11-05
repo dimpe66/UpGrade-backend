@@ -21,7 +21,21 @@ export const register = async (req: Request, res: Response) => {
     });
 
     const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "7d" });
-    res.status(201).json({ token, user: { id: user.id, email: user.email, firstName, lastName } });
+    res.status(201).json({
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName,
+        lastName,
+        xpLevel: user.xpLevel,
+        rating: user.rating,
+        contactData: user.contactData,
+        classroomAddress: user.classroomAddress,
+        onlineClassroomLink: user.onlineClassroomLink,
+        tutorSubjects: [],
+      },
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Error al registrar usuario" });
@@ -33,7 +47,10 @@ export const login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ error: "Faltan credenciales" });
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({
+      where: { email },
+      include: { tutorSubjects: { include: { subject: true } } },
+    });
     if (!user) return res.status(401).json({ error: "Credenciales inválidas" });
 
     const valid = await bcrypt.compare(password, user.password);
@@ -52,6 +69,7 @@ export const login = async (req: Request, res: Response) => {
         contactData: user.contactData,
         classroomAddress: user.classroomAddress,
         onlineClassroomLink: user.onlineClassroomLink,
+        tutorSubjects: user.tutorSubjects ?? [],
       },
     });
   } catch (err) {
@@ -67,7 +85,11 @@ export const me = async (req: Request, res: Response) => {
 
     const token = authHeader.split(" ")[1];
     const decoded = jwt.verify(token, JWT_SECRET) as { id: number };
-    const user = await prisma.user.findUnique({ where: { id: decoded.id } });
+
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.id },
+      include: { tutorSubjects: { include: { subject: true } } },
+    });
 
     if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
 
@@ -81,6 +103,7 @@ export const me = async (req: Request, res: Response) => {
       contactData: user.contactData,
       classroomAddress: user.classroomAddress,
       onlineClassroomLink: user.onlineClassroomLink,
+      tutorSubjects: user.tutorSubjects ?? [],
     });
   } catch (err) {
     console.error(err);

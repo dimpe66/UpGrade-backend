@@ -7,17 +7,8 @@ const prisma = new PrismaClient();
 export const getUsers = async (_req: AuthRequest, res: Response) => {
   try {
     const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        xpLevel: true,
-        rating: true,
-        contactData: true,
-        classroomAddress: true,
-        onlineClassroomLink: true,
-        profilePhoto: true,
+      include: {
+        tutorSubjects: { include: { subject: true } },
       },
       orderBy: { id: "asc" },
     });
@@ -32,17 +23,7 @@ export const getUserById = async (req: AuthRequest, res: Response) => {
     const id = Number(req.params.id);
     const user = await prisma.user.findUnique({
       where: { id },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        xpLevel: true,
-        rating: true,
-        contactData: true,
-        classroomAddress: true,
-        onlineClassroomLink: true,
-        profilePhoto: true,
+      include: {
         tutorAvailabilities: true,
         tutorSubjects: { include: { subject: true } },
       },
@@ -65,14 +46,7 @@ export const getTutorsWithAvailableSlots = async (_req: AuthRequest, res: Respon
           },
         },
       },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        rating: true,
-        contactData: true,
-        classroomAddress: true,
-        onlineClassroomLink: true,
+      include: {
         tutorSubjects: {
           include: { subject: { select: { id: true, name: true, iconUrl: true } } },
         },
@@ -133,17 +107,8 @@ export const updateMe = async (req: AuthRequest, res: Response) => {
     const updated = await prisma.user.update({
       where: { id: userId },
       data: payload,
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        xpLevel: true,
-        rating: true,
-        contactData: true,
-        classroomAddress: true,
-        onlineClassroomLink: true,
-        profilePhoto: true,
+      include: {
+        tutorSubjects: { include: { subject: true } },
       },
     });
 
@@ -161,6 +126,7 @@ export const updateTutorSubjects = async (req: AuthRequest, res: Response) => {
     if (!Array.isArray(subjectIds)) {
       return res.status(400).json({ error: "subjectIds debe ser un array de números" });
     }
+
     await prisma.tutorSubject.deleteMany({
       where: { tutorId: userId },
     });
@@ -179,9 +145,14 @@ export const updateTutorSubjects = async (req: AuthRequest, res: Response) => {
       include: { subject: true },
     });
 
+    const updatedUser = await prisma.user.findUnique({
+      where: { id: userId },
+      include: { tutorSubjects: { include: { subject: true } } },
+    });
+
     res.json({
       message: "Materias actualizadas correctamente",
-      tutorSubjects: updatedTutorSubjects,
+      user: updatedUser,
     });
   } catch (error) {
     console.error(error);

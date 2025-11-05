@@ -17,7 +17,7 @@ export const getUsers = async (_req: AuthRequest, res: Response) => {
         contactData: true,
         classroomAddress: true,
         onlineClassroomLink: true,
-        profilePhoto: true
+        profilePhoto: true,
       },
       orderBy: { id: "asc" },
     });
@@ -96,5 +96,59 @@ export const getTutorsWithAvailableSlots = async (_req: AuthRequest, res: Respon
     res.json(tutors);
   } catch {
     res.status(500).json({ error: "Error al obtener tutores disponibles" });
+  }
+};
+
+export const updateMe = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user!.id;
+
+    const {
+      classroomAddress,
+      onlineClassroomLink,
+      contactData,
+    }: {
+      classroomAddress?: string | null;
+      onlineClassroomLink?: string | null;
+      contactData?: string | null;
+    } = req.body || {};
+
+    const payload: Record<string, string | null> = {};
+    if (classroomAddress !== undefined) {
+      payload.classroomAddress =
+        classroomAddress === null ? null : String(classroomAddress).trim();
+    }
+    if (onlineClassroomLink !== undefined) {
+      payload.onlineClassroomLink =
+        onlineClassroomLink === null ? null : String(onlineClassroomLink).trim();
+    }
+    if (contactData !== undefined) {
+      payload.contactData = contactData === null ? null : String(contactData).trim();
+    }
+
+    if (Object.keys(payload).length === 0) {
+      return res.status(400).json({ error: "No hay campos para actualizar" });
+    }
+
+    const updated = await prisma.user.update({
+      where: { id: userId },
+      data: payload,
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        xpLevel: true,
+        rating: true,
+        contactData: true,
+        classroomAddress: true,
+        onlineClassroomLink: true,
+        profilePhoto: true,
+      },
+    });
+
+    res.json(updated);
+  } catch {
+    res.status(500).json({ error: "Error al actualizar el perfil" });
   }
 };

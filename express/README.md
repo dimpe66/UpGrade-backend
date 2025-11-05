@@ -10,16 +10,16 @@ JWT_SECRET="SUPERTOPSECRETSTRING_ACA"
 
 Pasos para inicializar la DB:
 
-# 🧱 Crear y aplicar migración
+# 1- Crear y aplicar migración
 npx prisma migrate dev --name init
 
-# 🔁 Regenerar cliente Prisma
+# 2- Regenerar cliente Prisma
 npx prisma generate
 
-# 🔄 Resetear base y correr seed
+# 3- Resetear base y correr seed
 npx prisma migrate reset
 
-# 🌱 Ejecutar solo el seed
+# 4- Ejecutar solo el seed
 npx prisma db seed
 
 # REST API Example with Express & Prisma Postgres

@@ -25,25 +25,25 @@ enum Modality {
 }
 
 model User {
-  id                 Int                 @id @default(autoincrement())
-  firstName          String
-  lastName           String
-  email              String              @unique
-  password           String
-  token              String?
-  xpLevel            Int                 @default(0)
-  rating             Float?
-  profilePhoto       String?
-  classroomAddress   String?
+  id                  Int                 @id @default(autoincrement())
+  firstName           String
+  lastName            String
+  email               String              @unique
+  password            String
+  token               String?
+  xpLevel             Int                 @default(0)
+  rating              Float?
+  profilePhoto        String?
+  classroomAddress    String?
   onlineClassroomLink String?
-  contactData        String?
+  contactData         String?
 
   tutorAvailabilities TutorAvailability[]
-  classSlots          ClassSlot[]        @relation("TutorClassSlots")
-  reservedSlots       ClassSlot[]        @relation("ReservedSlots")
-  lessonsAsStudent    Lesson[]           @relation("StudentLessons")
-  lessonsAsTutor      Lesson[]           @relation("TutorLessons")
-  tutorSubjects       TutorSubject[]     @relation("UserToSubject")
+  classSlots          ClassSlot[]         @relation("TutorClassSlots")
+  reservedSlots       ClassSlot[]         @relation("ReservedSlots")
+  lessonsAsStudent    Lesson[]            @relation("StudentLessons")
+  lessonsAsTutor      Lesson[]            @relation("TutorLessons")
+  tutorSubjects       TutorSubject[]      @relation("UserToSubject")
 }
 
 model Subject {
@@ -55,29 +55,26 @@ model Subject {
 }
 
 model TutorAvailability {
-  id         Int      @id @default(autoincrement())
+  id         Int   @id @default(autoincrement())
   tutorId    Int
-  weekday    Int
-  startTime  String
-  endTime    String
-  startDate  DateTime
-  endDate    DateTime
-  active     Boolean  @default(true)
-  tutor      User     @relation(fields: [tutorId], references: [id])
+  weekdays   Json
+  timeBlocks Json
+  active     Boolean @default(true)
+  tutor      User  @relation(fields: [tutorId], references: [id])
 }
 
 model ClassSlot {
-  id           Int         @id @default(autoincrement())
+  id           Int        @id @default(autoincrement())
   tutorId      Int
   date         DateTime
   startTime    String
   endTime      String
   reservedById Int?
-  status       SlotStatus  @default(AVAILABLE)
-  deleted      Boolean     @default(false)
+  status       SlotStatus @default(AVAILABLE)
+  deleted      Boolean    @default(false)
 
-  tutor        User        @relation("TutorClassSlots", fields: [tutorId], references: [id])
-  reservedBy   User?       @relation("ReservedSlots", fields: [reservedById], references: [id])
+  tutor        User       @relation("TutorClassSlots", fields: [tutorId], references: [id])
+  reservedBy   User?      @relation("ReservedSlots", fields: [reservedById], references: [id])
   lesson       Lesson?
 }
 

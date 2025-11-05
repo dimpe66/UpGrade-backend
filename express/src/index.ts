@@ -1,18 +1,19 @@
 import express from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 
-dotenv.config();
-
-import authRoutes from "./routes/auth.routes";
+import authRoutes from "./auth/auth.routes";
 import userRoutes from "./routes/user.routes";
 import subjectRoutes from "./routes/subject.routes";
 import availabilityRoutes from "./routes/availability.routes";
 import slotRoutes from "./routes/slots.routes";
 import lessonRoutes from "./routes/lesson.routes";
 
-const app = express();
+dotenv.config();
 
+const app = express();
 app.use(express.json());
+app.use(cors({ origin: "*", credentials: true }));
 
 app.get("/health", (_req, res) => res.json({ ok: true }));
 
@@ -23,12 +24,5 @@ app.use("/availability", availabilityRoutes);
 app.use("/slots", slotRoutes);
 app.use("/lessons", lessonRoutes);
 
-app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  console.error("❌ Error:", err.message);
-  res.status(500).json({ error: err.message || "Error interno del servidor" });
-});
-
 const PORT = Number(process.env.PORT ?? 3001);
-app.listen(PORT, () => {
-  console.log(`🚀 API running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 API running on port ${PORT}`));

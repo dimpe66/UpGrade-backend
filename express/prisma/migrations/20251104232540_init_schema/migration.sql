@@ -4,9 +4,14 @@ CREATE TABLE "User" (
     "firstName" TEXT NOT NULL,
     "lastName" TEXT NOT NULL,
     "email" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "token" TEXT,
     "xpLevel" INTEGER NOT NULL DEFAULT 0,
     "rating" REAL,
-    "profilePhoto" TEXT
+    "profilePhoto" TEXT,
+    "classroomAddress" TEXT,
+    "onlineClassroomLink" TEXT,
+    "contactData" TEXT
 );
 
 -- CreateTable
@@ -20,11 +25,8 @@ CREATE TABLE "Subject" (
 CREATE TABLE "TutorAvailability" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "tutorId" INTEGER NOT NULL,
-    "weekday" INTEGER NOT NULL,
-    "startTime" TEXT NOT NULL,
-    "endTime" TEXT NOT NULL,
-    "startDate" DATETIME NOT NULL,
-    "endDate" DATETIME NOT NULL,
+    "weekdays" JSONB NOT NULL,
+    "timeBlocks" JSONB NOT NULL,
     "active" BOOLEAN NOT NULL DEFAULT true,
     CONSTRAINT "TutorAvailability_tutorId_fkey" FOREIGN KEY ("tutorId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );

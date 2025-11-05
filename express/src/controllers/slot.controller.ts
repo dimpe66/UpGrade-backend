@@ -61,7 +61,6 @@ export const generateWeeklySlots = async (req: AuthRequest, res: Response) => {
       for (const day of weekdays) {
         const slotDateDay = addDays(monday, day);
 
-        // 📅 Verificar si ya existen slots activos ese día
         const existingDaySlots = await prisma.classSlot.findMany({
           where: {
             tutorId,
@@ -75,7 +74,7 @@ export const generateWeeklySlots = async (req: AuthRequest, res: Response) => {
 
         if (existingDaySlots.length > 0) {
           skippedDays.push(slotDateDay.toISOString().split("T")[0]);
-          continue; // ❌ Ya hay slots activos ese día → saltar
+          continue;
         }
 
         for (const block of timeBlocks) {

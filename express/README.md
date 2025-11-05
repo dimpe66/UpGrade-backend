@@ -7,6 +7,21 @@ PORT=3000
 DATABASE_URL="file:./dev.db"
 JWT_SECRET="SUPERTOPSECRETSTRING_ACA"
 
+
+Pasos para inicializar la DB:
+
+# 🧱 Crear y aplicar migración
+npx prisma migrate dev --name init
+
+# 🔁 Regenerar cliente Prisma
+npx prisma generate
+
+# 🔄 Resetear base y correr seed
+npx prisma migrate reset
+
+# 🌱 Ejecutar solo el seed
+npx prisma db seed
+
 # REST API Example with Express & Prisma Postgres
 
 This example shows how to implement a **REST API with TypeScript** using [Express](https://expressjs.com/), Prisma ORM and a [Prisma Postgres](https://www.prisma.io/postgres) database.

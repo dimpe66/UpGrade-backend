@@ -49,6 +49,9 @@ export const login = async (req: Request, res: Response) => {
         lastName: user.lastName,
         xpLevel: user.xpLevel,
         rating: user.rating,
+        contactData: user.contactData,
+        classroomAddress: user.classroomAddress,
+        onlineClassroomLink: user.onlineClassroomLink,
       },
     });
   } catch (err) {

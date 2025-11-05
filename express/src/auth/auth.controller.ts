@@ -30,7 +30,9 @@ export const login = async (req: Request, res: Response) => {
     const ok = await bcrypt.compare(password, user.password);
     if (!ok) return res.status(401).json({ error: "Credenciales inválidas" });
     const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "7d" });
-    res.json({ token, user: { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName } });
+    res.json({ token, user: { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, 
+      contactData: user.contactData, classroomAddress: user.classroomAddress, onlineClassroomLink: user.onlineClassroomLink
+     }});
   } catch {
     res.status(500).json({ error: "Error al iniciar sesión" });
   }

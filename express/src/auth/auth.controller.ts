@@ -54,6 +54,7 @@ export const me = async (req: Request, res: Response) => {
       contactData: user.contactData,
       classroomAddress: user.classroomAddress,
       onlineClassroomLink: user.onlineClassroomLink,
+      profilePhoto: user.profilePhoto
     });
   } catch {
     res.status(401).json({ error: "Token inválido o expirado" });

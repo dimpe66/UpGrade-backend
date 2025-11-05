@@ -8,13 +8,14 @@ const prisma = new PrismaClient();
 export const getLessons = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user!.id;
-    const { includePast } = req.query; 
+    const { includePast } = req.query;
     const now = startOfDay(new Date());
 
     const lessons = await prisma.lesson.findMany({
       where: {
         OR: [{ tutorId: userId }, { studentId: userId }],
-        ...(includePast ? {} : { timestamp: { gte: now } }), 
+        status: LessonStatus.PENDING, 
+        ...(includePast ? {} : { timestamp: { gte: now } }),
       },
       include: { tutor: true, student: true, subject: true, slot: true },
       orderBy: { timestamp: "asc" },

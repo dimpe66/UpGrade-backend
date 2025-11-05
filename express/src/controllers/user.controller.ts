@@ -17,6 +17,7 @@ export const getUsers = async (_req: AuthRequest, res: Response) => {
         contactData: true,
         classroomAddress: true,
         onlineClassroomLink: true,
+        profilePhoto: true
       },
       orderBy: { id: "asc" },
     });
@@ -41,6 +42,7 @@ export const getUserById = async (req: AuthRequest, res: Response) => {
         contactData: true,
         classroomAddress: true,
         onlineClassroomLink: true,
+        profilePhoto: true,
         tutorAvailabilities: true,
         tutorSubjects: { include: { subject: true } },
       },
